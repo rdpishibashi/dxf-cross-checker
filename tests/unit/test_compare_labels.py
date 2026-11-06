@@ -29,12 +29,16 @@ def test_basic_kubun_assignment():
 
 
 def test_candidate_column_uses_ref_designator_judgment():
-    """機器符号候補列は DXF-extract-labels と同じ判定（CAN／None）を付け、
-    候補でない行も絞り込まずに残す（master_index なしでは DEF は出ない）。"""
+    """機器符号候補列は DXF-extract-labels と同じ判定（CAN／空欄）を付け、
+    候補でない行も絞り込まずに残す（master_index なしでは DEF は出ない）。
+
+    空欄は欠損値。pandas 3（要件 `pandas>=3.0.0`）では文字列型の列になり、
+    `designator_mark()` の None が NaN になるため `pd.isna()` で判定する
+    （2026-11-06、`is None` で判定していて pandas 3.0.5 で失敗した）。"""
     df = compare_labels({'CB001': 1, '電源': 1, 'R10': 1}, {})
     assert _row(df, 'CB001')['機器符号候補'] == 'CAN'
-    assert _row(df, '電源')['機器符号候補'] is None
-    assert _row(df, 'R10')['機器符号候補'] is None   # A・C・L・Q・U・F 以外の英字1字+数字は OTHER
+    assert pd.isna(_row(df, '電源')['機器符号候補'])
+    assert pd.isna(_row(df, 'R10')['機器符号候補'])   # A・C・L・Q・U・F 以外の英字1字+数字は OTHER
     assert len(df) == 3
 
 

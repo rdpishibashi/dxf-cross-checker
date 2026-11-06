@@ -104,8 +104,10 @@ def compare_labels(a: dict, b: dict, master_index=None) -> pd.DataFrame:
     - columns: DIFF_COLUMNS（機器符号候補・ラベル・区分・A個数・B個数）
     - 機器符号候補: 比較キーに対する `ref_designator.designator_mark()`
       （DXF-extract-labels と同じ判定）。'DEF'（機器符号一覧 `master_index` に
-      含まれる）／'CAN'（候補パターンに一致）／None（どちらでもない。空欄）。
-      `master_index=None`（鍵なし等）なら DEF は出ず CAN／None のみ。行は絞り込まない
+      含まれる）／'CAN'（候補パターンに一致）／欠損（どちらでもない。空欄）。
+      pandas 3 では文字列型の列になり、欠損は `None` ではなく `NaN` になるので、
+      空欄の判定は `pd.isna()` で行う（画面は `fillna('')`、Excel は `write_blank`）。
+      `master_index=None`（鍵なし等）なら DEF は出ず CAN／欠損のみ。行は絞り込まない
     - 区分 ∈ {'A のみ', 'B のみ', '両方'}
     - 無い側の個数は pd.NA
     - ラベル昇順（sorted）
